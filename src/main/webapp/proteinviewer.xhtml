@@ -115,7 +115,8 @@
 												var="filter"
 												type="unordered"
 												rendered="#{not empty viewerBean.proteinViewer.inferenceHandler.appliedInference.filters}">
-											<h:outputText value="#{filter.filteringName} " />
+                                            
+                                            <h:outputText value="#{viewerBean.proteinViewer.inferenceHandler.getNiceInferenceFilteringName(filter)} " />
 											<h:outputText value="not" rendered="#{filter.filterNegate}" />
 											<h:outputText value=" #{filter.filterComparator.label} #{filter.filterValue} " />
 										</rich:list>

@@ -50,7 +50,7 @@
 					var="filter"
 					type="unordered"
 					rendered="#{not empty viewerBean.wizard.modeller.proteinModeller.appliedProteinInference.filters}">
-				<h:outputText value="#{filter.filteringName} " />
+				<h:outputText value="#{filter.filteringListName} " />
 				<h:outputText value="not" rendered="#{filter.filterNegate}" />
 				<h:outputText value=" #{filter.filterComparator.label} #{filter.filterValue} " />
 			</rich:list>
