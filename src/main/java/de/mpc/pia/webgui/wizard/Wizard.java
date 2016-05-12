@@ -227,8 +227,7 @@ public class Wizard {
      * @return
      */
     public void setCreatePSMSets(Boolean create) {
-        modeller.getPSMModeller().applyGeneralSettings(create,
-                modeller.getPSMModeller().getPSMSetSettings());
+        modeller.getPSMModeller().applyGeneralSettings(create);
     }
 
 
