@@ -185,7 +185,7 @@ public class PSMViewerFilterPanel {
      * Add a new filter for the current file with
      */
     public void addFilter() {
-        StringBuffer messageBuffer = new StringBuffer();
+        StringBuilder messageBuffer = new StringBuilder();
 
         // we have a valid value, so go on
         AbstractFilter newFilter = FilterFactory.newInstanceOf(filterShort,

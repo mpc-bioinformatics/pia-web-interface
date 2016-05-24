@@ -405,7 +405,7 @@ public class ProteinViewerInferencePanel {
      * Adds the new filter to the List of filters for this file.
      */
     public void addFilter() {
-        StringBuffer messageBuffer = new StringBuffer();
+        StringBuilder messageBuffer = new StringBuilder();
 
         AbstractFilter newFilter = FilterFactory.newInstanceOf(filterShort,
                 filterComparator, filterInput, negate, messageBuffer);
