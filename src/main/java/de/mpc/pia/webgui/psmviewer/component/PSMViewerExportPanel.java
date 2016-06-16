@@ -1,6 +1,5 @@
 package de.mpc.pia.webgui.psmviewer.component;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -9,6 +8,7 @@ import javax.faces.context.FacesContext;
 
 import de.mpc.pia.modeller.PIAModeller;
 import de.mpc.pia.modeller.PSMModeller;
+import de.mpc.pia.modeller.exporter.MzIdentMLExporter;
 import de.mpc.pia.modeller.exporter.MzTabExporter;
 import de.mpc.pia.webgui.psmviewer.PSMViewer;
 
@@ -106,10 +106,9 @@ public class PSMViewerExportPanel {
         externalContext.setResponseCharacterEncoding("UTF-8");
 
         try {
+            MzIdentMLExporter exporter = new MzIdentMLExporter(piaModeller);
             Writer writer = externalContext.getResponseOutputWriter();
-
-            psmModeller.exportMzIdentML(writer, fileID, exportFiltered);
-
+            exporter.exportToMzIdentML(fileID, writer, false, exportFiltered);
             writer.close();
         } catch (IOException e) {
             // TODO Better error/exception/logging

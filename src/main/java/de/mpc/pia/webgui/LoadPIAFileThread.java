@@ -106,7 +106,7 @@ public class LoadPIAFileThread extends Thread {
                     progress[0] = 97L;
                     loadingStatus = "building protein viewer...";
                     proteinViewer = new ProteinViewer(modeller.getProteinModeller(),
-                            configurationProperties);
+                            modeller, configurationProperties);
                     progress[0] = 99L;
                 } else {
                     errorMessages.add("Could not generate modeller.");
