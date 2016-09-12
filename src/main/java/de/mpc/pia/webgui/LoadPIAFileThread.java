@@ -1,6 +1,6 @@
 package de.mpc.pia.webgui;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,28 +97,22 @@ public class LoadPIAFileThread extends Thread {
             if (modeller.loadFileName(fileName, progress)) {
                 parsed = true;
                 progress[0] = 95L;
-                if (modeller != null) {
-                    loadingStatus = "building PSM viewer...";
-                    psmViewer = new PSMViewer(modeller.getPSMModeller(), modeller);
-                    progress[0] = 96L;
-                    loadingStatus = "building peptide viewer...";
-                    peptideViewer = new PeptideViewer(modeller.getPeptideModeller());
-                    progress[0] = 97L;
-                    loadingStatus = "building protein viewer...";
-                    proteinViewer = new ProteinViewer(modeller.getProteinModeller(),
-                            modeller, configurationProperties);
-                    progress[0] = 99L;
-                } else {
-                    errorMessages.add("Could not generate modeller.");
-                    LOGGER.error("Could not generate modeller.");
-                    success = false;
-                    progress[0] = -1L;
-                    return;
-                }
+
+                loadingStatus = "building PSM viewer...";
+                psmViewer = new PSMViewer(modeller.getPSMModeller(), modeller);
+                progress[0] = 96L;
+                loadingStatus = "building peptide viewer...";
+                peptideViewer = new PeptideViewer(modeller.getPeptideModeller());
+                progress[0] = 97L;
+                loadingStatus = "building protein viewer...";
+                proteinViewer = new ProteinViewer(modeller.getProteinModeller(),
+                        modeller, configurationProperties);
+
+                progress[0] = 99L;
             }
 
             success = true;
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             errorMessages.add("File '" + fileName + "' not found.");
             LOGGER.error("File '" + fileName + "' not found.", e);
             success = false;

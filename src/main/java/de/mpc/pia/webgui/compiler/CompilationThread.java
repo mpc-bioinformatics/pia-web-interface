@@ -1,6 +1,6 @@
 package de.mpc.pia.webgui.compiler;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import de.mpc.pia.intermediate.compiler.PIACompiler;
+import de.mpc.pia.intermediate.compiler.PIASimpleCompiler;
 
 /**
  * This is an actual running compilation.
@@ -18,150 +19,149 @@ import de.mpc.pia.intermediate.compiler.PIACompiler;
  */
 public class CompilationThread extends Thread {
 
-	/** the ID of the thread */
-	private Long ID;
+    /** the ID of the thread */
+    private Long id;
 
-	/** monitor to notify, if we are finished */
-	private Object parentMonitor;
+    /** monitor to notify, if we are finished */
+    private Object parentMonitor;
 
-	/** the name of the project */
-	private String projectName;
+    /** the name of the project */
+    private String projectName;
 
-	/** the files for compilation */
-	private List<TempCompileFile> files;
+    /** the files for compilation */
+    private List<TempCompileFile> files;
 
-	/** the number of allowed threads */
-	private int nrThreads;
+    /** the number of allowed threads */
+    private int nrThreads;
 
-	/** the output path for the data */
-	private String dataPath;
+    /** the output path for the data */
+    private String dataPath;
 
-	/** logger for this class */
-	private static final Logger logger = Logger.getLogger(CompilationThread.class);
-
-
-	/**
-	 * Basic constructor.
-	 *
-	 * @param ID
-	 * @param projectName
-	 * @param files
-	 */
-	public CompilationThread(Long ID, String projectName,
-			List<TempCompileFile> files, int nrThreads, String dataPath,
-			Object parentMonitor) {
-		this.ID = ID;
-		this.parentMonitor = parentMonitor;
-		this.projectName = projectName;
-		this.files = files;
-		this.nrThreads = nrThreads;
-		this.dataPath = dataPath;
-
-		this.setName("PIA-CompilationThread-" + ID);
-	}
+    /** logger for this class */
+    private static final Logger LOGGER = Logger.getLogger(CompilationThread.class);
 
 
-	/**
-	 * Returns the internal ID of the CompilationThread.
-	 * @return
-	 */
-	public Long getCompilationID() {
-		return ID;
-	}
+    /**
+     * Basic constructor.
+     *
+     * @param ID
+     * @param projectName
+     * @param files
+     */
+    public CompilationThread(Long id, String projectName,
+            List<TempCompileFile> files, int nrThreads, String dataPath,
+            Object parentMonitor) {
+        this.id = id;
+        this.parentMonitor = parentMonitor;
+        this.projectName = projectName;
+        this.files = files;
+        this.nrThreads = nrThreads;
+        this.dataPath = dataPath;
 
-	/**
-	 * Getter for the projectName
-	 * @return
-	 */
-	public String getProjectName() {
-		return projectName;
-	}
+        this.setName("PIA-CompilationThread-" + id);
+    }
 
 
-	@Override
-	public void run() {
-		logger.info(getName() + " started to run for '" + projectName + "'");
+    /**
+     * Returns the internal ID of the CompilationThread.
+     * @return
+     */
+    public Long getCompilationID() {
+        return id;
+    }
 
-		PIACompiler piaCompiler = new PIACompiler();
-		piaCompiler.setNrThreads(nrThreads);
-		piaCompiler.setName(projectName);
+    /**
+     * Getter for the projectName
+     * @return
+     */
+    public String getProjectName() {
+        return projectName;
+    }
 
-		boolean ok = true;
 
-		for (TempCompileFile file : files) {
+    @Override
+    public void run() {
+        LOGGER.info(getName() + " started to run for '" + projectName + "'");
 
-			String fileName = file.getFile().getFilePath();
-			String name = file.getName();
-			String additionalInfoFileName = null;
-			String typeShort = file.getTypeShort();
+        PIACompiler piaCompiler = new PIASimpleCompiler();
+        piaCompiler.setNrThreads(nrThreads);
+        piaCompiler.setName(projectName);
 
-			if (file.getAdditionalInfoFile() != null) {
-				additionalInfoFileName =
-						file.getAdditionalInfoFile().getFilePath();
-			}
+        boolean ok = true;
 
-			logger.info("compilation file:" + fileName +
-					"\n\tname: " + name +
-					"\n\tadd: " + additionalInfoFileName +
-					"\n\ttype: " + typeShort);
+        for (TempCompileFile file : files) {
 
-			try {
-				if (!piaCompiler.getDataFromFile(name, fileName,
-						additionalInfoFileName, typeShort)) {
-					logger.error("Something went wrong while getting data from " +
-							fileName);
-				}
-			} catch (Exception e) {
-				logger.error("Something went wrong while getting data from " +
-						fileName, e);
-				ok = false;
-				break;
-			}
-		}
+            String fileName = file.getFile().getFilePath();
+            String name = file.getName();
+            String additionalInfoFileName = null;
+            String typeShort = file.getTypeShort();
 
-		if (ok) {
-			piaCompiler.buildClusterList();
-			piaCompiler.buildIntermediateStructure();
+            if (file.getAdditionalInfoFile() != null) {
+                additionalInfoFileName =
+                        file.getAdditionalInfoFile().getFilePath();
+            }
 
-			SimpleDateFormat sdfDate = new SimpleDateFormat("/yyyyMMddHHmmssSSS");
-			String dateStr = sdfDate.format(new Date());
-			String outName =
-					dataPath +
-					dateStr + "-" +
-					projectName.trim().replaceAll("\\s", "_") + ".pia.xml";
-			try {
-			    piaCompiler.writeOutXML(outName);
-			} catch (FileNotFoundException e) {
-			    logger.error(getName() + " Could not write to file: " + outName);
-			}
+            LOGGER.info("compilation file:" + fileName
+                    + "\n\tname: " + name
+                    + "\n\tadd: " + additionalInfoFileName
+                    + "\n\ttype: " + typeShort);
 
-			logger.info(getName() + " finished.");
-		} else {
-			logger.info(getName() + " failed.");
-		}
+            try {
+                if (!piaCompiler.getDataFromFile(name, fileName,
+                        additionalInfoFileName, typeShort)) {
+                    LOGGER.error("Something went wrong while getting data from " +
+                            fileName);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Something went wrong while getting data from " +
+                        fileName, e);
+                ok = false;
+                break;
+            }
+        }
 
-		// clean up (delete the files)
-		for (TempCompileFile file : files) {
-			TempUploadedFile rmvFile = file.getFile();
-			TempUploadedFile additionalFile = file.getAdditionalInfoFile();
+        if (ok) {
+            piaCompiler.buildClusterList();
+            piaCompiler.buildIntermediateStructure();
 
-			if (rmvFile != null) {
-				String fileName = rmvFile.getFilePath();
-				if (!rmvFile.removeFromDisk()) {
-					logger.warn("Could not delete orphaned file '" + fileName + "'");
-				}
-			}
+            SimpleDateFormat sdfDate = new SimpleDateFormat("/yyyyMMddHHmmssSSS");
+            String dateStr = sdfDate.format(new Date());
+            String outName = dataPath
+                    + dateStr + "-"
+                    + projectName.trim().replaceAll("\\s", "_") + ".pia.xml";
+            try {
+                piaCompiler.writeOutXML(outName);
+            } catch (IOException e) {
+                LOGGER.error(getName() + " Could not write to file: " + outName, e);
+            }
 
-			if (additionalFile != null) {
-				String fileName = additionalFile.getFilePath();
-				if (!additionalFile.removeFromDisk()) {
-					logger.warn("Could not delete orphaned file '" + fileName + "'");
-				}
-			}
-		}
+            LOGGER.info(getName() + " finished.");
+        } else {
+            LOGGER.info(getName() + " failed.");
+        }
 
-		synchronized (parentMonitor) {
-			parentMonitor.notifyAll();
-		}
-	}
+        // clean up (delete the files)
+        for (TempCompileFile file : files) {
+            TempUploadedFile rmvFile = file.getFile();
+            TempUploadedFile additionalFile = file.getAdditionalInfoFile();
+
+            if (rmvFile != null) {
+                String fileName = rmvFile.getFilePath();
+                if (!rmvFile.removeFromDisk()) {
+                    LOGGER.warn("Could not delete orphaned file '" + fileName + "'");
+                }
+            }
+
+            if (additionalFile != null) {
+                String fileName = additionalFile.getFilePath();
+                if (!additionalFile.removeFromDisk()) {
+                    LOGGER.warn("Could not delete orphaned file '" + fileName + "'");
+                }
+            }
+        }
+
+        synchronized (parentMonitor) {
+            parentMonitor.notifyAll();
+        }
+    }
 }
