@@ -1,11 +1,7 @@
 package de.mpc.pia.webgui;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 
@@ -89,42 +85,28 @@ public class LoadPIAFileThread extends Thread {
             return;
         }
 
-        try {
-            modeller = new PIAModeller();
-            progress[0] = 1L;
+        modeller = new PIAModeller();
+        progress[0] = 1L;
 
-            loadingStatus = "started parsing...";
-            if (modeller.loadFileName(fileName, progress)) {
-                parsed = true;
-                progress[0] = 95L;
+        loadingStatus = "started parsing...";
+        if (modeller.loadFileName(fileName, progress)) {
+            parsed = true;
+            progress[0] = 95L;
 
-                loadingStatus = "building PSM viewer...";
-                psmViewer = new PSMViewer(modeller.getPSMModeller(), modeller);
-                progress[0] = 96L;
-                loadingStatus = "building peptide viewer...";
-                peptideViewer = new PeptideViewer(modeller.getPeptideModeller());
-                progress[0] = 97L;
-                loadingStatus = "building protein viewer...";
-                proteinViewer = new ProteinViewer(modeller.getProteinModeller(),
-                        modeller, configurationProperties);
+            loadingStatus = "building PSM viewer...";
+            psmViewer = new PSMViewer(modeller.getPSMModeller(), modeller);
+            progress[0] = 96L;
+            loadingStatus = "building peptide viewer...";
+            peptideViewer = new PeptideViewer(modeller.getPeptideModeller());
+            progress[0] = 97L;
+            loadingStatus = "building protein viewer...";
+            proteinViewer = new ProteinViewer(modeller.getProteinModeller(),
+                    modeller, configurationProperties);
 
-                progress[0] = 99L;
-            }
-
+            progress[0] = 99L;
             success = true;
-        } catch (IOException e) {
-            errorMessages.add("File '" + fileName + "' not found.");
-            LOGGER.error("File '" + fileName + "' not found.", e);
-            success = false;
-            progress[0] = -1L;
-        } catch (JAXBException e) {
-            errorMessages.add("File '" + fileName + "' could not be parsed.");
-            LOGGER.error("File '" + fileName + "' could not be parsed.", e);
-            success = false;
-            progress[0] = -1L;
-        } catch (XMLStreamException e) {
-            errorMessages.add("File '" + fileName + "' could not be parsed.");
-            LOGGER.error("File '" + fileName + "' could not be parsed.", e);
+        } else {
+            errorMessages.add("File '" + fileName + "' could not be loaded.");
             success = false;
             progress[0] = -1L;
         }
