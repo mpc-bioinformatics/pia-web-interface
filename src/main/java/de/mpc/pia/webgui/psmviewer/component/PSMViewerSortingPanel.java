@@ -38,7 +38,7 @@ public class PSMViewerSortingPanel {
 
 
     /** the prefix before all score tags */
-    public static final String PSM_SCORE_PREFIX = PSMReportItemComparator.score_prefix;
+    public static final String PSM_SCORE_PREFIX = PSMReportItemComparator.SCORE_PREFIX;
 
 
 

@@ -4,7 +4,7 @@
 
 	<groupId>de.mpc.pia</groupId>
 	<artifactId>pia-web-interface</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.3.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>PIA web interface</name>
 	<url>https://github.com/mpc-bioinformatics/pia-web-interface</url>
@@ -30,7 +30,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<pia.version>1.2.0-SNAPSHOT</pia.version>
+		<pia.version>1.3.0</pia.version>
 	</properties>
 
 	<dependencies>
